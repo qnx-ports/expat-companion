@@ -1,0 +1,39 @@
+pkgname=expat
+pkgver=2.7.3
+_tagver=R_${pkgver//./_}
+pkgrel=0
+pkgdesc="XML Parser library written in C"
+url="https://libexpat.github.io/"
+arch="all"
+license="MIT"
+source="https://github.com/libexpat/libexpat/releases/download/$_tagver/expat-$pkgver.tar.bz2"
+depends="lib$pkgname"
+checkdepends="bash clang libc++-dev"
+# pull in xmlwf for dev
+depends_dev="$pkgname=$pkgver-r$pkgrel"
+# Order matters, ensure -dev does not gobble up static libraries.
+subpackages="$pkgname-static $pkgname-dev $pkgname-doc lib$pkgname:libs"
+
+build() {
+    CC="gcc" \
+    CXX="clang++" \
+    ./configure \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --prefix=/usr \
+        --mandir=/usr/share/man \
+        --enable-static
+    make
+}
+
+check() {
+    make check
+}
+
+package() {
+    make DESTDIR="$pkgdir/" install
+}
+
+sha512sums="
+92dd8a31a88ca73d5d8890be40c231ec037d8d13f6059a88bcf7bfaaa77c1c94dc2874f2dae508c0d077a3798bc006cfe9d7d0a918e08a67149d332c7fce4d23  expat-2.7.3.tar.bz2
+"
